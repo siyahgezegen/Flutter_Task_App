@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_task_app/feature/my_widgets.dart/custom_alert.dart';
-import 'package:flutter_task_app/view/task.dart/task.dart';
+import 'package:flutter_task_app/feature/my_widgets/app_bar.dart';
+import 'package:flutter_task_app/view/task/task.dart';
 import 'add_task_view_model.dart';
 
 class TaskModeclslView extends TaskModelclsViewModel {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(context),
+      appBar: CustomAppBar.customAppBar(context),
       floatingActionButton: FloatingActionButton(onPressed: () {}),
       body: Center(
         child: Column(
@@ -52,8 +52,12 @@ class TaskModeclslView extends TaskModelclsViewModel {
                 ),
                 onPressed: () {
                   saveModel();
-                  Navigator.pop(context,
-                    MaterialPageRoute(builder: (context) => const TaskPage()));
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TaskPage(),
+                    ),
+                  );
                 },
                 child: const Text(
                   'Save Task',
@@ -62,23 +66,6 @@ class TaskModeclslView extends TaskModelclsViewModel {
           ],
         ),
       ),
-    );
-  }
-
-  AppBar customAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: const Color.fromARGB(255, 255, 17, 0),
-      title: const Text('Task List'),
-      actions: [
-        IconButton(
-          onPressed: () {
-            //! Alert and Github linkLink
-            CustomAlert().showMyDialog(context);
-          },
-          icon: const Icon(Icons.info_outlined,
-              color: Color.fromARGB(255, 255, 255, 255), size: 30),
-        )
-      ],
     );
   }
 }

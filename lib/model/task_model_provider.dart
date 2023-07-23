@@ -4,21 +4,31 @@ import 'package:flutter_task_app/model/taskmodel.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TaskProvider {
-  late Database database;
+  Database? _database;
   final int _version = 1;
   final String _dbName = "todo";
   String columnId = 'id';
   String columnHeader = 'header';
   String columnContent = 'content';
-  void open() async {
-    database = await openDatabase(
+
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await _initialize();
+    return _database!;
+  }
+
+  Future<Database> _initialize() async {
+    var database = await openDatabase(
       _dbName,
       version: _version,
       onCreate: (db, version) {
         cretaTodoTable(db);
       },
     );
+    return database;
   }
+
+  Future<void> open() async {}
 
   void cretaTodoTable(Database db) {
     db.execute(
@@ -26,13 +36,13 @@ class TaskProvider {
   }
 
   Future<List<TaskModel>> getList() async {
-    if (database != null) open();
+    final database = await TaskProvider().database;
     List<Map<String, dynamic>> maps = await database.query(_dbName);
     return maps.map((e) => TaskModel.fromJson(e)).toList();
   }
 
   Future<TaskModel?> getItem(int id) async {
-    if (database != null) open();
+    final database = await TaskProvider().database;
     final maps = await database.query(
       _dbName,
       where: '$columnId=?',
@@ -46,7 +56,7 @@ class TaskProvider {
   }
 
   Future<bool> deleteItem(int id) async {
-    if (database != null) open();
+    final database = await TaskProvider().database;
     final maps = await database.delete(
       _dbName,
       where: '$columnId=?',
@@ -56,7 +66,7 @@ class TaskProvider {
   }
 
   Future<bool> updateItem(int id, TaskModel model) async {
-    if (database != null) open();
+    final database = await TaskProvider().database;
     final maps = await database.update(
       _dbName,
       model.toJson(),
@@ -66,12 +76,8 @@ class TaskProvider {
     return maps != null;
   }
 
-  Future<void> close() async {
-    return database.close();
-  }
-
   Future<bool> insertItem(TaskModel model) async {
-    if (database != null) open();
+    final database = await TaskProvider().database;
     final maps = await database.insert(_dbName, model.toJson());
     return maps != null;
   }
